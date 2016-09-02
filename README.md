@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/granate.svg)](https://badge.fury.io/js/granate)
 [![Build Status](https://travis-ci.org/almilo/granate.svg?branch=master)](https://travis-ci.org/almilo/granate)
-[![Coverage Status](https://coveralls.io/repos/github/almilo/granate/badge.svg?branch=master)](https://coveralls.io/github/almilo/granate?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/almilo/granate/badge.svg)](https://coveralls.io/github/almilo/granate)
 
 Granate container for annotated GraphQL
 
