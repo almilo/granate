@@ -1,6 +1,5 @@
 {
   "name": "granate",
-  "version": "0.0.0",
   "description": "Granate container for annotated GraphQL",
   "main": "dist/index.js",
   "files": [
@@ -13,7 +12,8 @@
     "dev": "npm run compile -- --watch | npm test -- --watch",
     "build": "rimraf dist && npm test",
     "postinstall": "typings install",
-    "prepublish": "npm build"
+    "prepublish": "npm build",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": "Alberto Mijares <almilo@almilo.es>",
   "license": "MIT",
@@ -38,7 +38,8 @@
     "mocha": "^3.0.2",
     "rimraf": "^2.5.4",
     "typescript": "^1.8.10",
-    "typings": "^1.3.3"
+    "typings": "^1.3.3",
+    "semantic-release": "^4.3.5"
   },
   "typings": "dist/index.d.ts"
 }
