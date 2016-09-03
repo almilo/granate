@@ -31,8 +31,10 @@
     "url": "https://github.com/almilo/granate"
   },
   "dependencies": {
-    "graphql": ">=0.7.0",
     "graphql-tools": "^0.6.5"
+  },
+  "peerDependencies": {
+    "graphql": ">=0.7.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
