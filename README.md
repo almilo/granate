@@ -15,28 +15,28 @@ of really useful possibilities.
 Imagine that you want to implement a Todo application and you have drafted a GraphQL schema which looks as follows:
 
 ```
- # Domain entity which represents a Todo object
- type Todo {
-     id: ID!
-     title: String!
-     completed: Boolean!
- }
- 
- # Query model for Todos
- type Query {
-     # Returns the collection of Todos filtered by completed status (optional)
-     todos(completed: Boolean): [Todo]
- }
- 
- # Mutations for Todos
- type Mutation {
-     # Adds an uncompleted Todo with the given description
-     addTodo(title: String!): Todo!
-     # Removes a Todo by id
-     removeTodo(id: ID!): Todo!
-     # Toggles the completed state of a Todo by id
-     toggleTodo(id: ID!): Todo!
- }
+# Domain entity which represents a Todo object
+type Todo {
+    id: ID!
+    title: String!
+    completed: Boolean!
+}
+
+# Query model for Todos
+type Query {
+    # Returns the collection of Todos filtered by completed status (optional)
+    todos(completed: Boolean): [Todo]
+}
+
+# Mutations for Todos
+type Mutation {
+    # Adds an uncompleted Todo with the given description
+    addTodo(title: String!): Todo!
+    # Removes a Todo by id
+    removeTodo(id: ID!): Todo!
+    # Toggles the completed state of a Todo by id
+    toggleTodo(id: ID!): Todo!
+}
 ```
 
 As of [graphql-js@0.7.0](https://medium.com/apollo-stack/all-you-need-to-know-about-graphql-js-0-7-921e75dd7fd1), by
