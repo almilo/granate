@@ -6,14 +6,14 @@
     "dist"
   ],
   "scripts": {
+    "typings": "typings install",
     "compile": "tsc",
-    "pretest": "npm run compile",
-    "test": "mocha 'dist/**/*.spec.js' -r dist/support.spec.js",
+    "test": "npm run typings && npm run compile && npm run test:only",
+    "test:only": "mocha 'dist/**/*.spec.js' -r dist/support.spec.js",
     "coverage": "istanbul cover _mocha 'dist/**/*.spec.js' -r dist/support.spec.js -x '**/*.spec.js'",
     "postcoverage": "remap-istanbul --input coverage/coverage.json --type lcovonly --output coverage/lcov.info && istanbul check-coverage --statements 95 --branches 95",
     "dev": "npm run compile -- --watch | npm test -- --watch",
     "build": "rimraf dist && npm test",
-    "postinstall": "typings install",
     "prepublish": "npm build",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
