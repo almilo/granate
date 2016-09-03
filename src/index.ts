@@ -1,15 +1,15 @@
-import { buildSchema, GraphQLSchema, graphql } from 'graphql';
+import { buildSchema as buildGraphqlSchema, GraphQLSchema, graphql } from 'graphql';
 import { addMockFunctionsToSchema } from 'graphql-tools';
 import { invariant } from './lib';
 
-export default function (schemaText: string, query: string): Promise<any> {
+export function granate(schemaText: string, query: string): Promise<any> {
     invariant(typeof query === 'string' && query.length > 0, 'Query must be a non empty string.');
 
-    return graphql(createSchema(schemaText), query);
+    return graphql(buildSchema(schemaText), query);
 }
 
-function createSchema(schemaText: string): GraphQLSchema {
-    const schema = buildSchema(schemaText);
+export function buildSchema(schemaText: string): GraphQLSchema {
+    const schema = buildGraphqlSchema(schemaText);
 
     addMockFunctionsToSchema({schema});
 
