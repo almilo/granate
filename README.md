@@ -7,11 +7,31 @@
 Granate container for annotated GraphQL
 
 ## Introduction
-GraphqQL is an amazing technology that allows to build application APIs in a much better way than by using REST
-services. On top of this, GraphQL can be defined using a textual representation (schema language) which offers a lot
-of really useful possibilities.
+[GraphQL](http://graphql.org/) is an amazing technology that allows to build application APIs in a much better way than
+by implementing REST services. On top of this, [GraphQL](http://graphql.org/) can be defined using a textual
+representation (schema language) which offers a lot of really useful possibilities. **Granate** leverages these
+possibilities.
 
-## TL;DR
+## Usage
+To understand better how to use **granate**, please have a look at the examples in
+[granate-showcase](https://github.com/almilo/granate-showcase) 
+
+## Installation
+In order to use **granate** from the CLI, install [granate-cli](https://github.com/almilo/granate-cli) with the
+following command:
+ 
+```
+> npm i -g granate-cli
+```
+
+If you prefer to use **granate** as an API, install **granate** and **graphql** (peer dependency of **granate**) in your
+application with the following command:
+                                 
+```
+> npm i granate graphql --save
+```
+
+## Where does **granate** come from? (TL;DR)
 Imagine that you want to implement a Todo application and you have drafted a GraphQL schema which looks as follows:
 
 ```
@@ -150,6 +170,7 @@ Well, we easily can if we use the package
 refine the mock data or even the implementation to use as ```rootValue```?
 * And what if we could use mock data where the root value provides no implementation?
 * Couldn't we eventually use a legacy REST API to implement part of the schema?
-* And what if we could reuse not only existing REST APIs but also GraphQL endpoints?
+* And if we could reuse not only existing REST APIs but also GraphQL endpoints?
+* Even better, what if I could just install a library and do all this from the CLI without writing any code?
 
 ###... enter Granate!
