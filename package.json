@@ -53,7 +53,7 @@
   "config": {
     "ghooks": {
       "commit-msg": "validate-commit-msg",
-      "pre-push": "npm test && npm run coverage"
+      "pre-push": "npm run test:only && npm run coverage"
     }
   }
 }
