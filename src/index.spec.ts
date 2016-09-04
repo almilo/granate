@@ -1,7 +1,7 @@
 import { granate, buildSchema } from './index';
 import { GraphQLSchema } from 'graphql';
 
-const fooSchema = `type Query { foo: String }`;
+const fooSchema = 'type Query { foo: String }';
 
 describe('Granate', function () {
     describe('granate()', function () {
@@ -18,11 +18,32 @@ describe('Granate', function () {
         });
 
         it('should return a promise with an error message', function () {
-            return granate(fooSchema, `{ bar }`).then(errorMessage).should.eventually.contain('Cannot query field "bar"');
+            return granate(fooSchema, '{ bar }').then(errorMessage).should.eventually.contain('Cannot query field "bar"');
         });
 
         it('should return a promise that evaluates to mock data when the schema and the query are valid', function () {
-            return granate(fooSchema, `{ foo }`).should.eventually.deep.equal(data({foo: 'Hello World'}));
+            return granate(fooSchema, '{ foo }').should.eventually.deep.equal(data({foo: 'Hello World'}));
+        });
+
+        it('should return a promise that evaluates to root value data when a root value is passed', function () {
+            const rootValue = {
+                foo() {
+                    return 'bar';
+                }
+            };
+
+            return granate(fooSchema, '{ foo }', rootValue).should.eventually.deep.equal(data({foo: 'bar'}));
+        });
+
+        it('should return a promise that evaluates to context data when a root value and context are passed', function () {
+            const contextValue = {
+                data: 'baz'
+            };
+            const rootValue = {
+                foo: (sourceObject: any, params: any, context: {data: string}) => context.data
+            };
+
+            return granate(fooSchema, '{ foo }', rootValue, contextValue).should.eventually.deep.equal(data({foo: 'baz'}));
         });
     });
 
