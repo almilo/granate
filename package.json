@@ -12,7 +12,7 @@
     "test:only": "mocha 'dist/**/*.spec.js' -r dist/support.spec.js",
     "coverage": "istanbul cover _mocha 'dist/**/*.spec.js' -r dist/support.spec.js -x '**/*.spec.js'",
     "postcoverage": "remap-istanbul --input coverage/coverage.json --type lcovonly --output coverage/lcov.info && istanbul check-coverage --statements 95 --branches 95",
-    "dev": "npm run compile -- --watch | npm test -- --watch",
+    "dev": "npm run compile -- --watch | npm run test:only -- --watch",
     "build": "rimraf dist && npm test",
     "prepublish": "npm build",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
