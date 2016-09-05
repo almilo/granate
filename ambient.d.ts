@@ -1,5 +1,6 @@
 declare module 'graphql' {
-    export function buildSchema(schema: any): any;
+    export function buildSchema(schema: string | Source): GraphQLSchema;
+    export function buildASTSchema(schema: Document): GraphQLSchema;
 }
 
 declare module 'graphql-tools' {

@@ -1,6 +1,7 @@
-import { buildSchema as buildGraphqlSchema, GraphQLSchema, graphql } from 'graphql';
+import { buildASTSchema, parse, GraphQLSchema, graphql } from 'graphql';
 import { addMockFunctionsToSchema } from 'graphql-tools';
 import { invariant } from './lib';
+import { AnnotationFactory, Annotation, AnnotationExtractor } from './annotations';
 
 export function granate(schema: string | GraphQLSchema,
                         requestString: string,
@@ -33,10 +34,21 @@ export function granate(schema: string | GraphQLSchema,
     );
 }
 
-export function buildSchema(schemaText: string, mocks?: Object): GraphQLSchema {
-    const schema = buildGraphqlSchema(schemaText);
+export function buildSchema(schemaText: string,
+                            mocks: Object = {},
+                            annotationFactories: Array<AnnotationFactory> = []): GraphQLSchema {
 
+    const schemaAst = parse(schemaText);
+    const schema = buildASTSchema(schemaAst);
+    const annotationExtractor: AnnotationExtractor = new AnnotationExtractor(annotationFactories);
+    const annotations = annotationExtractor.parse(schemaAst);
+
+    applyAnnotations(annotations, schema, mocks);
     addMockFunctionsToSchema({schema, mocks});
 
     return schema;
+}
+
+function applyAnnotations(annotations: Array<Annotation>, schema: GraphQLSchema, mocks: Object) {
+    annotations.forEach(annotation => annotation.apply(schema, mocks));
 }

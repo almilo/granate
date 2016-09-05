@@ -1,6 +1,7 @@
 import * as sinon from 'sinon';
 import { GraphQLSchema, graphql } from 'graphql';
 import { granate, buildSchema } from './index';
+import { AnnotationFactory, DirectiveInfo } from './annotations/index';
 
 const fooSchema = 'type Query { foo: String }';
 
@@ -111,6 +112,16 @@ describe('Granate', function () {
             schema.should.be.instanceof(GraphQLSchema);
             return graphql(schema, '{ foo }').should.eventually.deep.equal(data({foo: 'bar'}));
         });
+
+        it('should apply annotations', function () {
+            const annotationFactory = createAnnotationFactory('baz');
+            const annotatedFooSchema = 'type Query { foo: String  @baz}';
+
+            const schema = buildSchema(annotatedFooSchema, undefined, [annotationFactory]);
+
+            schema.should.be.instanceof(GraphQLSchema);
+            return graphql(schema, '{ foo }').should.eventually.deep.equal(data({foo: 'baz'}));
+        });
     });
 });
 
@@ -122,4 +133,19 @@ function data(payload: Object) {
 
 function errorMessage(payload: {errors: Array<{message: string}>}): string {
     return payload.errors[0].message;
+}
+
+function createAnnotationFactory(tag: string): AnnotationFactory {
+    const annotationFactory: any = (directiveInfo: DirectiveInfo, typeName: string, fieldName: string) => {
+        return {
+            apply(schema: GraphQLSchema, mocks: Object): void {
+                mocks[typeName] = () => ({
+                    [fieldName]: () => tag
+                });
+            }
+        }
+    };
+    annotationFactory.TAG = tag;
+
+    return annotationFactory;
 }
