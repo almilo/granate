@@ -3,7 +3,8 @@
   "dependencies": {
     "chai": "registry:npm/chai#3.5.0+20160723033700",
     "chai-as-promised": "registry:npm/chai-as-promised#5.1.0+20160310030142",
-    "graphql": "registry:npm/graphql#0.5.0+20160602041655"
+    "graphql": "registry:npm/graphql#0.5.0+20160602041655",
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   },
   "globalDependencies": {
     "ambient": "file:ambient.d.ts",

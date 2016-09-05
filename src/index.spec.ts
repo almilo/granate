@@ -1,10 +1,19 @@
-import { granate, buildSchema } from './index';
+import * as sinon from 'sinon';
 import { GraphQLSchema, graphql } from 'graphql';
+import { granate, buildSchema } from './index';
 
 const fooSchema = 'type Query { foo: String }';
 
 describe('Granate', function () {
     describe('granate()', function () {
+        beforeEach(function () {
+            this.sinon = sinon.sandbox.create();
+        });
+
+        afterEach(function () {
+            this.sinon.restore();
+        });
+
         it('should throw an exception when the schema is not valid', function () {
             (() => granate(null, 'foo')).should.throw('Schema must be either');
             (() => granate('', 'foo')).should.throw('Schema must be either');
@@ -58,6 +67,21 @@ describe('Granate', function () {
             };
 
             return granate(fooSchema, '{ foo }', undefined, undefined, undefined, mocks).should.eventually.deep.equal(data({foo: 'bar'}));
+        });
+
+        it('should show a warning and return a promise that does not evaluate to custom mock data when schema instance and mocks are passed together', function () {
+            const warnStub = this.sinon.stub(console, 'warn');
+            const mocks = {
+                Query: () => ({
+                    foo: () => 'bar'
+                })
+            };
+
+            return granate(buildSchema(fooSchema), '{ foo }', undefined, undefined, undefined, mocks)
+                .then(result => {
+                    warnStub.calledWithMatch('Mocks will be ignored').should.be.true;
+                    result.should.deep.equal(data({foo: 'Hello World'}));
+                });
         });
     });
 
