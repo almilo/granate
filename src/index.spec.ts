@@ -49,6 +49,16 @@ describe('Granate', function () {
 
             return granate(fooSchema, '{ foo }', rootValue, contextValue).should.eventually.deep.equal(data({foo: 'baz'}));
         });
+
+        it('should return a promise that evaluates to custom mock data when mocks are passed', function () {
+            const mocks = {
+                Query: () => ({
+                    foo: () => 'bar'
+                })
+            };
+
+            return granate(fooSchema, '{ foo }', undefined, undefined, undefined, mocks).should.eventually.deep.equal(data({foo: 'bar'}));
+        });
     });
 
     describe('buildSchema()', function () {
