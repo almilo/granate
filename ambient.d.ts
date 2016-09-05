@@ -3,5 +3,5 @@ declare module 'graphql' {
 }
 
 declare module 'graphql-tools' {
-    export function addMockFunctionsToSchema(options: {schema: any}): void;
+    export function addMockFunctionsToSchema(options: {schema: any, mocks?: Object}): void;
 }

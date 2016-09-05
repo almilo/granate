@@ -1,5 +1,5 @@
 import { granate, buildSchema } from './index';
-import { GraphQLSchema } from 'graphql';
+import { GraphQLSchema, graphql } from 'graphql';
 
 const fooSchema = 'type Query { foo: String }';
 
@@ -55,8 +55,23 @@ describe('Granate', function () {
             (() => buildSchema('type Query {}')).should.throw('Query fields must be an object with field names');
         });
 
-        it('should return a GraphQL schema', function () {
-            return buildSchema(fooSchema).should.be.instanceof(GraphQLSchema);
+        it('should return an executable GraphQL schema with default mock data', function () {
+            const schema = buildSchema(fooSchema);
+
+            schema.should.be.instanceof(GraphQLSchema);
+            return graphql(schema, '{ foo }').should.eventually.deep.equal(data({foo: 'Hello World'}));
+        });
+
+        it('should return an executable GraphQL schema with custom mock data', function () {
+            const mocks = {
+                Query: () => ({
+                    foo: () => 'bar'
+                })
+            };
+            const schema = buildSchema(fooSchema, mocks);
+
+            schema.should.be.instanceof(GraphQLSchema);
+            return graphql(schema, '{ foo }').should.eventually.deep.equal(data({foo: 'bar'}));
         });
     });
 });

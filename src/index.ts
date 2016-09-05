@@ -20,10 +20,10 @@ export function granate(schemaText: string,
     );
 }
 
-export function buildSchema(schemaText: string): GraphQLSchema {
+export function buildSchema(schemaText: string, mocks?: Object): GraphQLSchema {
     const schema = buildGraphqlSchema(schemaText);
 
-    addMockFunctionsToSchema({schema});
+    addMockFunctionsToSchema({schema, mocks});
 
     return schema;
 }
