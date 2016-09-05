@@ -6,8 +6,8 @@ const fooSchema = 'type Query { foo: String }';
 describe('Granate', function () {
     describe('granate()', function () {
         it('should throw an exception when the schema is not valid', function () {
-            (() => granate(null, 'foo')).should.throw('of null');
-            (() => granate('', 'foo')).should.throw('Syntax Error GraphQL');
+            (() => granate(null, 'foo')).should.throw('Schema must be either');
+            (() => granate('', 'foo')).should.throw('Schema must be either');
             (() => granate('type Foo {}', 'foo')).should.throw('with query type or a type named Query');
             (() => granate('type Query {}', 'foo')).should.throw('Query fields must be an object with field names');
         });
@@ -21,8 +21,12 @@ describe('Granate', function () {
             return granate(fooSchema, '{ bar }').then(errorMessage).should.eventually.contain('Cannot query field "bar"');
         });
 
-        it('should return a promise that evaluates to mock data when the schema and the query are valid', function () {
+        it('should return a promise that evaluates to mock data when the schema is valid text and the query is valid', function () {
             return granate(fooSchema, '{ foo }').should.eventually.deep.equal(data({foo: 'Hello World'}));
+        });
+
+        it('should return a promise that evaluates to mock data when the schema is a schema instance and the query is valid', function () {
+            return granate(buildSchema(fooSchema), '{ foo }').should.eventually.deep.equal(data({foo: 'Hello World'}));
         });
 
         it('should return a promise that evaluates to root value data when a root value is passed', function () {
