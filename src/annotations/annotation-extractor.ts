@@ -1,5 +1,5 @@
 import { parse, visit, Document } from 'graphql';
-import { AnnotationFactory, AnnotationArgument, DirectiveInfo, Annotation } from './index';
+import { AnnotationFactory, DirectiveArgument, DirectiveInfo, Annotation } from './index';
 
 interface ASTNode {
     kind: string,
@@ -143,7 +143,7 @@ const converters = {
  * @param argumentNode AST node with a GraphQL argument value which should be transformed into the corresponding JS value
  * @returns an object with name and value
  */
-function parseArgument(argumentNode: ASTNode): AnnotationArgument {
+function parseArgument(argumentNode: ASTNode): DirectiveArgument {
     return {
         name: argumentNode.name.value,
         value: toJSON(argumentNode.value.kind, argumentNode.value.value)

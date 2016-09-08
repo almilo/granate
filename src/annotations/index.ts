@@ -1,13 +1,13 @@
 import { GraphQLSchema } from 'graphql';
 
-export type AnnotationArgument = {
+export type DirectiveArgument = {
     name: string,
     value: any
 };
 
 export type DirectiveInfo = {
     tag: string,
-    arguments: Array<AnnotationArgument>
+    arguments: Array<DirectiveArgument>
 }
 
 export type Annotation = {
@@ -16,7 +16,9 @@ export type Annotation = {
 
 export type AnnotationFactory = {
     TAG: string
-    (directiveInfo: DirectiveInfo, typeName: string, fieldName: string): Annotation
+    (directiveInfo: DirectiveInfo, typeName: string, fieldName?: string): Annotation
 }
 
 export { AnnotationExtractor } from './annotation-extractor';
+
+export { mockAnnotationFactory } from './mock';

@@ -3,6 +3,8 @@ import { addMockFunctionsToSchema } from 'graphql-tools';
 import { invariant } from './lib';
 import { AnnotationFactory, Annotation, AnnotationExtractor } from './annotations';
 
+export { AnnotationFactory, Annotation, AnnotationExtractor, mockAnnotationFactory } from './annotations';
+
 export function granate(schema: string | GraphQLSchema,
                         requestString: string,
                         rootValue?: Object,
@@ -10,8 +12,14 @@ export function granate(schema: string | GraphQLSchema,
                         variableValues?: {[key: string]: any},
                         mocks?: Object): Promise<any> {
 
-    invariant(typeof requestString === 'string' && requestString.length > 0, 'Query must be a non empty string.');
-    invariant(schema && (!(schema instanceof GraphQLSchema) || !(typeof schema === 'string')), 'Schema must be either a GraphQL schema instance or a string in schema language.');
+    invariant(
+        typeof requestString === 'string' && requestString.length > 0,
+        'Query must be a non empty string.'
+    );
+    invariant(
+        schema && (!(schema instanceof GraphQLSchema) || !(typeof schema === 'string')),
+        'Schema must be either a GraphQL schema instance or a string in schema language.'
+    );
 
     if (schema instanceof GraphQLSchema && mocks) {
         console.warn(
