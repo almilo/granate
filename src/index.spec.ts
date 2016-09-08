@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import { GraphQLSchema, graphql } from 'graphql';
-import { granate, buildSchema } from './index';
+import { granate, buildSchema, IMocks } from './index';
 import { AnnotationFactory, DirectiveInfo } from './annotations/index';
 
 const fooSchema = 'type Query { foo: String }';
@@ -61,7 +61,7 @@ describe('Granate', function () {
         });
 
         it('should return a promise that evaluates to custom mock data when mocks are passed', function () {
-            const mocks = {
+            const mocks: IMocks = {
                 Query: () => ({
                     foo: () => 'bar'
                 })
@@ -72,7 +72,7 @@ describe('Granate', function () {
 
         it('should show a warning and return a promise that does not evaluate to custom mock data when schema instance and mocks are passed together', function () {
             const warnStub = this.sinon.stub(console, 'warn');
-            const mocks = {
+            const mocks: IMocks = {
                 Query: () => ({
                     foo: () => 'bar'
                 })
@@ -102,7 +102,7 @@ describe('Granate', function () {
         });
 
         it('should return an executable GraphQL schema with custom mock data', function () {
-            const mocks = {
+            const mocks: IMocks  = {
                 Query: () => ({
                     foo: () => 'bar'
                 })

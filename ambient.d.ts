@@ -4,10 +4,6 @@ declare module 'graphql' {
     export function buildASTSchema(schema: Document): GraphQLSchema;
 }
 
-declare module 'graphql-tools' {
-    export function addMockFunctionsToSchema(options: {schema: any, mocks?: Object}): void;
-}
-
 declare module 'casual' {
     const casual: any;
 

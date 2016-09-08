@@ -5,12 +5,14 @@ import { AnnotationFactory, Annotation, AnnotationExtractor } from './annotation
 
 export { AnnotationFactory, Annotation, AnnotationExtractor, mockAnnotationFactory } from './annotations';
 
+export type IMocks = { [key: string]: () => any };
+
 export function granate(schema: string | GraphQLSchema,
                         requestString: string,
                         rootValue?: Object,
                         contextValue?: Object,
-                        variableValues?: {[key: string]: any},
-                        mocks?: Object): Promise<any> {
+                        variableValues?: {},
+                        mocks?: IMocks): Promise<any> {
 
     invariant(
         typeof requestString === 'string' && requestString.length > 0,
@@ -43,7 +45,7 @@ export function granate(schema: string | GraphQLSchema,
 }
 
 export function buildSchema(schemaText: string,
-                            mocks: Object = {},
+                            mocks: IMocks = {},
                             annotationFactories: Array<AnnotationFactory> = []): GraphQLSchema {
 
     const schemaAst = parse(schemaText);
