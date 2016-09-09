@@ -3,7 +3,13 @@ import { addMockFunctionsToSchema } from 'graphql-tools';
 import { invariant } from './lib';
 import { AnnotationFactory, Annotation, AnnotationExtractor } from './annotations';
 
-export { AnnotationFactory, Annotation, AnnotationExtractor, mockAnnotationFactory } from './annotations';
+export {
+    AnnotationFactory,
+    Annotation,
+    AnnotationExtractor,
+    mockAnnotationFactory,
+    standardAnnotationFactories
+} from './annotations';
 
 export type IMocks = { [key: string]: () => any };
 

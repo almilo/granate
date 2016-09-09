@@ -35,12 +35,14 @@ class MockAnnotation {
 
 const ANNOTATION_TAG = 'mock';
 
-export function mockAnnotationFactory(directiveInfo: DirectiveInfo, typeName: string, fieldName?: string): Annotation {
+const anyMockAnnotationFactory: any = function (directiveInfo: DirectiveInfo, typeName: string, fieldName?: string): Annotation {
     const valueArgument = findArgument(ANNOTATION_TAG, 'value', directiveInfo.arguments, true);
 
     invariant(typeName && typeName !== '', `Type name is required in '${ANNOTATION_TAG}' annotation.`);
 
     return new MockAnnotation(valueArgument.value, typeName, fieldName);
-}
+};
 
-(<AnnotationFactory>mockAnnotationFactory).TAG = ANNOTATION_TAG;
+anyMockAnnotationFactory.TAG = ANNOTATION_TAG;
+
+export const mockAnnotationFactory: AnnotationFactory = anyMockAnnotationFactory;

@@ -1,4 +1,5 @@
 import { GraphQLSchema } from 'graphql';
+import { mockAnnotationFactory } from './mock';
 
 export type DirectiveArgument = {
     name: string,
@@ -22,3 +23,7 @@ export type AnnotationFactory = {
 export { AnnotationExtractor } from './annotation-extractor';
 
 export { mockAnnotationFactory } from './mock';
+
+export const standardAnnotationFactories = [
+    mockAnnotationFactory
+];
