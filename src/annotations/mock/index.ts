@@ -1,7 +1,7 @@
 import { GraphQLSchema } from 'graphql';
 import * as casual from 'casual';
 import { invariant } from '../../lib';
-import { findArgument, createMock, createFieldMock } from '../lib';
+import { extractArguments, createMock, createFieldMock, ArgumentDescriptors } from '../lib';
 import { AnnotationFactory, Annotation, DirectiveInfo } from '../index';
 
 /**
@@ -36,11 +36,14 @@ class MockAnnotation {
 const ANNOTATION_TAG = 'mock';
 
 const anyMockAnnotationFactory: any = function (directiveInfo: DirectiveInfo, typeName: string, fieldName?: string): Annotation {
-    const valueArgument = findArgument(ANNOTATION_TAG, 'value', directiveInfo.arguments, true);
-
     invariant(typeName && typeName !== '', `Type name is required in '${ANNOTATION_TAG}' annotation.`);
 
-    return new MockAnnotation(valueArgument.value, typeName, fieldName);
+    const argumentDescriptors: ArgumentDescriptors = {
+        value: { required: true, type: 'string'}
+    };
+    const {value} = extractArguments(ANNOTATION_TAG, directiveInfo.arguments, argumentDescriptors);
+
+    return new MockAnnotation(value.value, typeName, fieldName);
 };
 
 anyMockAnnotationFactory.TAG = ANNOTATION_TAG;

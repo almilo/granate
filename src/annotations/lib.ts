@@ -1,15 +1,38 @@
 import { DirectiveArgument } from '../annotations/index';
 import { invariant } from '../lib/index';
 
-export function findArgument(tag: string,
-                             name: string,
-                             args: Array<DirectiveArgument>,
-                             required: boolean): DirectiveArgument {
-    const argument = args.find(argument => argument.name === name);
+export type ArgumentDescriptor = {
+    required?: boolean,
+    type?: string
+}
 
-    invariant(!required || argument, `Missing required argument: '${name}' in '${tag}' annotation.`);
+export type ArgumentDescriptors = {[key: string]: ArgumentDescriptor};
 
-    return argument;
+export function extractArguments(tag: string,
+                                 args: Array<DirectiveArgument>,
+                                 argumentDescriptors: ArgumentDescriptors): {[key: string]: any} {
+    return Object.keys(argumentDescriptors).reduce(extractArgument, {});
+
+    function extractArgument(extractedArguments: {[key: string]: any}, argumentName: string) {
+        const argumentDescriptor = argumentDescriptors[argumentName];
+        const extractedArgument = args.find(argument => argument.name === argumentName);
+
+        invariant(
+            !argumentDescriptor.required || extractedArgument,
+            `Missing required argument: '${argumentName}' in '${tag}' annotation.`
+        );
+
+        if (extractedArgument) {
+            invariant(
+                !argumentDescriptor.type || typeof extractedArgument.value === argumentDescriptor.type,
+                `Argument should be of type: '${argumentDescriptor.type}' but it is of type '${typeof extractedArgument.value}' in '${tag}' annotation.`
+            );
+
+            extractedArguments[argumentName] = extractedArgument;
+        }
+
+        return extractedArguments;
+    }
 }
 
 export function createFieldMock(fieldName: string, value: any) {
