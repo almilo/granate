@@ -1,4 +1,5 @@
 import { parse, visit, Document } from 'graphql';
+import { invariant } from '../lib/index';
 import { AnnotationFactory, DirectiveArgument, DirectiveInfo, Annotation } from './index';
 
 interface ASTNode {
@@ -29,6 +30,8 @@ export class AnnotationExtractor {
     private annotationFactories: AnnotationFactoryMap;
 
     constructor(annotationFactories: Array<AnnotationFactory>) {
+        invariant(Array.isArray(annotationFactories), 'Annotation factories must be an array.');
+
         this.annotationFactories = annotationFactories.reduce(asObjectProperty, <AnnotationFactoryMap>{});
 
         function asObjectProperty(annotationFactoriesByTag: AnnotationFactoryMap, annotationFactory: AnnotationFactory) {

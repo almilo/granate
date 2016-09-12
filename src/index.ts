@@ -11,60 +11,56 @@ export {
     standardAnnotationFactories
 } from './annotations';
 
-export type IMocks = { [key: string]: () => any };
+export type Mocks = { [key: string]: () => any };
 
-export function granate(schema: string | GraphQLSchema,
-                        requestString: string,
-                        rootValue?: Object,
-                        contextValue?: Object,
-                        variableValues?: {},
-                        mocks?: IMocks): Promise<any> {
-
-    invariant(
-        typeof requestString === 'string' && requestString.length > 0,
-        'Query must be a non empty string.'
-    );
-    invariant(
-        schema && (!(schema instanceof GraphQLSchema) || !(typeof schema === 'string')),
-        'Schema must be either a GraphQL schema instance or a string in schema language.'
-    );
-
-    if (schema instanceof GraphQLSchema && mocks) {
-        console.warn(
-            [
-                'Mocks passed along with schema instance. Mocks will be ignored.',
-                'In order to use custom mocks, either pass schema as text and use the mocks parameter',
-                'or use buildSchema(schemaText, mocks) and pass only the resulting schema instance as schema.'
-            ].join(' ')
-        );
-    }
-
-    const schemaInstance = typeof schema === 'string' ? buildSchema(schema, mocks) : schema;
-
-    return graphql(
-        schemaInstance,
-        requestString,
-        rootValue,
-        contextValue,
-        variableValues
-    );
+export type GranateContext = {
+    rootValue?: Object,
+    contextValue?: Object,
+    mocks?: Mocks,
+    annotationFactories?: Array<AnnotationFactory>
 }
 
-export function buildSchema(schemaText: string,
-                            mocks: IMocks = {},
-                            annotationFactories: Array<AnnotationFactory> = []): GraphQLSchema {
+export function granate(schemaText: string,
+                        requestString: string,
+                        variableValues?: {},
+                        granateContext: GranateContext = {}): Promise<any> {
+    const {schema, rootValue, contextValue} = buildSchemaAndContext(schemaText, granateContext);
+
+    return graphql(schema, requestString, rootValue, contextValue, variableValues);
+}
+
+export function buildSchemaAndContext(schemaText: string, granateContext: GranateContext): {
+    schema: GraphQLSchema,
+    rootValue: Object,
+    contextValue: Object
+} {
+    invariant(
+        typeof schemaText === 'string' && schemaText.length > 0,
+        'Schema must be a non-empty string.'
+    );
 
     const schemaAst = parse(schemaText);
     const schema = buildASTSchema(schemaAst);
-    const annotationExtractor: AnnotationExtractor = new AnnotationExtractor(annotationFactories);
+    const annotationExtractor: AnnotationExtractor = new AnnotationExtractor(granateContext.annotationFactories || []);
     const annotations = annotationExtractor.parse(schemaAst);
+    const rootValue = Object.assign({}, granateContext.rootValue);
+    const contextValue = Object.assign({}, granateContext.contextValue);
+    const mocks = Object.assign({}, granateContext.mocks);
 
-    applyAnnotations(annotations, schema, mocks);
+    applyAnnotations(annotations, schema, mocks, rootValue, contextValue);
     addMockFunctionsToSchema({schema, mocks});
 
-    return schema;
+    return {
+        schema,
+        rootValue,
+        contextValue
+    };
 }
 
-function applyAnnotations(annotations: Array<Annotation>, schema: GraphQLSchema, mocks: Object) {
+function applyAnnotations(annotations: Array<Annotation>,
+                          schema: GraphQLSchema,
+                          mocks: Mocks,
+                          rootValue: Object,
+                          contextValue: Object) {
     annotations.forEach(annotation => annotation.apply(schema, mocks));
 }
