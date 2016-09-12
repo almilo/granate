@@ -14,7 +14,7 @@
     "postcoverage": "remap-istanbul --input coverage/coverage.json --type lcovonly --output coverage/lcov.info && istanbul check-coverage --statements 95 --branches 95",
     "dev": "npm run compile -- --watch | npm run test:only -- --watch",
     "build": "rimraf dist && npm test",
-    "prepublish": "npm build",
+    "prepublish": "npm run build",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": "Alberto Mijares <almilo@almilo.es>",
@@ -55,7 +55,7 @@
   "config": {
     "ghooks": {
       "commit-msg": "validate-commit-msg",
-      "pre-push": "npm run test:only && npm run coverage"
+      "pre-push": "npm run build && npm run coverage"
     }
   }
 }
