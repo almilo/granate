@@ -67,4 +67,19 @@ describe('MockAnnotation', function () {
         mocks.foo().bar.should.be.a('string');
         mocks.foo().baz.should.be.a('string');
     });
+
+    it('should pass the arguments to casual', function () {
+        const argsDirectiveInfo = {
+            tag: 'mock', arguments: [
+                {name: 'value', value: 'date'},
+                {name: 'args', value: '["DD.MM.YY"]'}
+            ]
+        };
+        const mockAnnotation = mockAnnotationFactory(argsDirectiveInfo, 'foo', 'bar');
+        const mocks: any = {};
+
+        mockAnnotation.apply(null, mocks);
+
+        mocks.foo().bar.should.match(/..\...\.../);
+    });
 });
