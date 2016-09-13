@@ -34,13 +34,3 @@ export function extractArguments(tag: string,
         return extractedArguments;
     }
 }
-
-export function createFieldMock(fieldName: string, value: any) {
-    return () => ({
-        [fieldName]: createMock(value)
-    });
-}
-
-export function createMock(value: any) {
-    return () => value;
-}

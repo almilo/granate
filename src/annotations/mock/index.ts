@@ -1,7 +1,7 @@
 import { GraphQLSchema } from 'graphql';
 import * as casual from 'casual';
 import { invariant } from '../../lib';
-import { extractArguments, createMock, createFieldMock, ArgumentDescriptors } from '../lib';
+import { extractArguments, ArgumentDescriptors } from '../lib';
 import { AnnotationFactory, Annotation, DirectiveInfo } from '../index';
 
 /**
@@ -25,11 +25,11 @@ class MockAnnotation {
     }
 
     apply(schema: GraphQLSchema, mocks: Object): void {
-        invariant(!mocks[this.typeName], `Mock for type: '${this.typeName}' already exists.`);
+        const casualValueFactory = () => casual[this.value];
 
-        const casualValue = casual[this.value];
-
-        mocks[this.typeName] = this.fieldName ? createFieldMock(this.fieldName, casualValue) : createMock(casualValue);
+        mocks[this.typeName] = this.fieldName ?
+            createFieldMock(this.typeName, mocks[this.typeName], this.fieldName, casualValueFactory) :
+            casualValueFactory;
     }
 }
 
@@ -39,7 +39,7 @@ const anyMockAnnotationFactory: any = function (directiveInfo: DirectiveInfo, ty
     invariant(typeName && typeName !== '', `Type name is required in '${ANNOTATION_TAG}' annotation.`);
 
     const argumentDescriptors: ArgumentDescriptors = {
-        value: { required: true, type: 'string'}
+        value: {required: true, type: 'string'}
     };
     const {value} = extractArguments(ANNOTATION_TAG, directiveInfo.arguments, argumentDescriptors);
 
@@ -49,3 +49,12 @@ const anyMockAnnotationFactory: any = function (directiveInfo: DirectiveInfo, ty
 anyMockAnnotationFactory.TAG = ANNOTATION_TAG;
 
 export const mockAnnotationFactory: AnnotationFactory = anyMockAnnotationFactory;
+
+
+function createFieldMock(typeName: string, typeMock: Function, fieldName: string, valueFactory: Function): Function {
+    if (typeMock && typeMock()[fieldName]) {
+        throw new Error(`Mock for field: '${fieldName}' of type: ${typeName} already exists.`);
+    }
+
+    return () => Object.assign((typeMock && typeMock() || {}), {[fieldName]: valueFactory()});
+}

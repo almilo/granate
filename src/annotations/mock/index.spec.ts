@@ -18,15 +18,6 @@ describe('MockAnnotation', function () {
             .should.throw(`Type name is required`);
     });
 
-    it('should throw when the mock already exists', function () {
-        const mockAnnotation = mockAnnotationFactory(directiveInfo, 'foo');
-        const mocks: any = {
-            foo: (): any => null
-        };
-
-        (() => mockAnnotation.apply(null, mocks)).should.throw('already exists');
-    });
-
     it('should mock the type', function () {
         const mockAnnotation = mockAnnotationFactory(directiveInfo, 'foo');
         const mocks: any = {};
@@ -36,12 +27,44 @@ describe('MockAnnotation', function () {
         mocks.foo().should.be.a('string');
     });
 
-    it('should mock the field', function () {
+    it('should throw when the field mock already exists', function () {
+        const mockAnnotation = mockAnnotationFactory(directiveInfo, 'foo', 'bar');
+        const mocks: any = {
+            foo: (): any => ({bar: 'baz'})
+        };
+
+        (() => mockAnnotation.apply(null, mocks)).should.throw('already exists');
+    });
+
+    it('should mock the field when it is the only field mock', function () {
         const mockAnnotation = mockAnnotationFactory(directiveInfo, 'foo', 'bar');
         const mocks: any = {};
 
         mockAnnotation.apply(null, mocks);
 
-        mocks.foo().bar().should.be.a('string');
+        mocks.foo().bar.should.be.a('string');
+    });
+
+    it('should mock the field when there is already another field mock', function () {
+        const mockAnnotation = mockAnnotationFactory(directiveInfo, 'foo', 'bar');
+        const mocks: any = {
+            foo: (): any => ({})
+        };
+
+        mockAnnotation.apply(null, mocks);
+
+        mocks.foo().bar.should.be.a('string');
+    });
+
+    it('should mock the two fields', function () {
+        const mockAnnotation1 = mockAnnotationFactory(directiveInfo, 'foo', 'bar');
+        const mockAnnotation2 = mockAnnotationFactory(directiveInfo, 'foo', 'baz');
+        const mocks: any = {};
+
+        mockAnnotation1.apply(null, mocks);
+        mockAnnotation2.apply(null, mocks);
+
+        mocks.foo().bar.should.be.a('string');
+        mocks.foo().baz.should.be.a('string');
     });
 });
