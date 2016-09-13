@@ -43,7 +43,7 @@ const anyMockAnnotationFactory: any = function (directiveInfo: DirectiveInfo, ty
     };
     const {value} = extractArguments(ANNOTATION_TAG, directiveInfo.arguments, argumentDescriptors);
 
-    return new MockAnnotation(value.value, typeName, fieldName);
+    return new MockAnnotation(value, typeName, fieldName);
 };
 
 anyMockAnnotationFactory.TAG = ANNOTATION_TAG;

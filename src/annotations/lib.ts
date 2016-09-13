@@ -28,7 +28,7 @@ export function extractArguments(tag: string,
                 `Argument should be of type: '${argumentDescriptor.type}' but it is of type '${typeof extractedArgument.value}' in '${tag}' annotation.`
             );
 
-            extractedArguments[argumentName] = extractedArgument;
+            extractedArguments[argumentName] = extractedArgument.value;
         }
 
         return extractedArguments;
