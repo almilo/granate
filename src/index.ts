@@ -62,5 +62,5 @@ function applyAnnotations(annotations: Array<Annotation>,
                           mocks: Mocks,
                           rootValue: Object,
                           contextValue: Object) {
-    annotations.forEach(annotation => annotation.apply(schema, mocks));
+    annotations.forEach(annotation => annotation.apply(schema, mocks, rootValue, contextValue));
 }
