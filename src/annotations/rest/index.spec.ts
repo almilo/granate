@@ -204,7 +204,9 @@ describe('RestAnnotation', function () {
         restAnnotation.apply(schema, {}, rootValue, {});
 
         return rootValue.foo({}, {param1: 'value1', param2: 'value2'}, {})
-            .then(result => makeRequestStub.args[0][0].url.should.equal('http://localhost:4000/foo/value1/bar/value2'));
+            .then(result => makeRequestStub.args[0][0].should.deep.equal(withDefaults({
+                url: 'http://localhost:4000/foo/value1/bar/value2'
+            })));
     });
 
     it('should throw when there is no value for an url template', () => {
@@ -331,10 +333,13 @@ describe('RestAnnotation', function () {
         createAnnotation('Query', null, [{name: 'customHeaders', value: ['Foo: Bar', 'Baz: {{baz}}']}]).apply(schema, {}, rootValue, contextValue);
         createAnnotation('Query', 'foo', [{name: 'url', value: 'foo'}]).apply(schema, {}, rootValue, contextValue);
 
-        return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.should.deep.equal({
-            'Foo': 'Bar',
-            'Baz': 'Biz'
-        }));
+        return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].should.deep.equal(withDefaults({
+            url: 'foo',
+            headers: {
+                'Foo': 'Bar',
+                'Baz': 'Biz'
+            }
+        })));
     });
 
     it('should support custom headers with value resolution', () => {
@@ -347,10 +352,13 @@ describe('RestAnnotation', function () {
 
         restAnnotation.apply(schema, {}, rootValue, {});
 
-        return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.should.deep.equal({
-            'Foo': 'Bar',
-            'Baz': 'Biz'
-        }));
+        return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].should.deep.equal(withDefaults({
+            url: 'foo',
+            headers: {
+                'Foo': 'Bar',
+                'Baz': 'Biz'
+            }
+        })));
     });
 });
 
