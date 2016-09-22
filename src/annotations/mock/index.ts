@@ -16,14 +16,24 @@ class MockAnnotation {
     }
 
     apply(schema: GraphQLSchema, mocks: Object): void {
-        mocks[this.typeName] = this.fieldName ?
-            createFieldMock(this.typeName, mocks[this.typeName], this.fieldName, casualValueFactory.bind(this)) :
-            casualValueFactory.bind(this);
+        const boundValueFactory = valueFactory.bind(this);
 
-        function casualValueFactory() {
+        mocks[this.typeName] = this.fieldName ?
+            createFieldMock(this.typeName, mocks[this.typeName], this.fieldName, boundValueFactory) :
+            boundValueFactory;
+
+        function valueFactory() {
             const casualValue = casual[this.value];
 
-            return typeof casualValue === 'function' ? casualValue.apply(casual, this.args) : casualValue;
+            if (casualValue) {
+                return typeof casualValue === 'function' ? casualValue.apply(casual, this.args) : casualValue;
+            } else {
+                return this.value === 'one_of' ? oneOf(this.args) : this.value;
+            }
+
+            function oneOf(args: Array<any> = []): any {
+                return args[Math.floor(Math.random() * args.length)];
+            }
         }
     }
 }
@@ -34,7 +44,7 @@ const anyMockAnnotationFactory: any = function (directiveInfo: DirectiveInfo, ty
     invariant(typeName && typeName !== '', `Type name is required in '${ANNOTATION_TAG}' annotation.`);
 
     const argumentDescriptors: ArgumentDescriptors = {
-        value: {type: 'string', required: true},
+        value: {type: 'any', required: true},
         args: {type: 'object'}
     };
     const {value, args} = extractArguments(ANNOTATION_TAG, directiveInfo.arguments, argumentDescriptors);
