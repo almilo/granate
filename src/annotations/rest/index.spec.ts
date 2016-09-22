@@ -91,7 +91,7 @@ describe('RestAnnotation', function () {
 
     it('should make a request with given defaults and return the data', () => {
         const restAnnotation1 = createAnnotation('Query', null, [
-            {name: 'baseUrl', value: 'http://localhost:4000/'},
+            {name: 'baseUrl', value: 'http://localhost:4000'},
             {name: 'basicAuthorization', value: 'user:pass'}
         ]);
         const restAnnotation2 = createAnnotation('Query', 'foo', [
@@ -108,7 +108,7 @@ describe('RestAnnotation', function () {
             .then(result => {
                 makeRequestStub.calledOnce.should.be.true;
                 makeRequestStub.args[0][0].should.deep.equal(withDefaults({
-                    baseUrl: 'http://localhost:4000/',
+                    baseUrl: 'http://localhost:4000',
                     url: 'foo',
                     method: 'post',
                     headers: {
@@ -119,6 +119,22 @@ describe('RestAnnotation', function () {
                 return result;
             })
             .should.eventually.become('bar');
+    });
+
+    it('should ignore baseUrl when url is absolute', () => {
+        const rootValue: any = {};
+        const contextValue: any = {};
+
+        createAnnotation('Query', null, [{name: 'baseUrl', value: 'http://localhost:4000'}]).apply(schema, {}, rootValue, contextValue);
+        createAnnotation('Query', 'foo', [{name: 'url', value: 'http://localhost:5000/foo'}]).apply(schema, {}, rootValue, contextValue);
+
+        return rootValue.foo({}, {}, contextValue)
+            .then(() => {
+                makeRequestStub.calledOnce.should.be.true;
+                makeRequestStub.args[0][0].should.deep.equal(withDefaults({
+                    url: 'http://localhost:5000/foo'
+                }));
+            });
     });
 
     it('should replace authorization variables with environment values and send it as header', () => {

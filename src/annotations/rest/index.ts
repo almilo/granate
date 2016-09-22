@@ -93,11 +93,12 @@ function createResolver(requestDefaults: RequestDefaults, annotationArguments: A
     return (source, args, context) => {
         // use the parameters to substitute the url templates and keep the remaining parameters
         const {url, parameters} = replaceUrlTemplates(annotationArguments.url, annotationArguments.parameters, args);
+        const isAbsoluteUrl = url.match(/^(.*):\/\//);
         const request: Request = {
             jar: requestDefaults.jar,
             json: requestDefaults.json,
             method: annotationArguments.method || requestDefaults.method,
-            baseUrl: annotationArguments.baseUrl || requestDefaults.baseUrl,
+            baseUrl: !isAbsoluteUrl ? annotationArguments.baseUrl || requestDefaults.baseUrl : undefined,
             url,
             parameters,
             headers: requestDefaults.headers,
