@@ -57,7 +57,7 @@ describe('MockAnnotation', function () {
     });
 
     it('should pass the arguments to casual', function () {
-        const argsDirectiveInfo = [{name: 'value', value: 'date'}, {name: 'args', value: '["DD.MM.YY"]'}];
+        const argsDirectiveInfo = [{name: 'value', value: 'date'}, {name: 'args', value: ['DD.MM.YY']}];
         const mocks: any = {};
 
         createAnnotation('foo', 'bar', argsDirectiveInfo).apply(null, mocks, {}, {});

@@ -12,14 +12,7 @@ import { AnnotationFactory, Annotation, DirectiveInfo } from '../index';
  *
  */
 class MockAnnotation {
-    args: Array<any> = [];
-
-    constructor(private value: string, private typeName: string, private fieldName?: string, argsString: string = '') {
-        argsString = argsString.trim();
-        if (argsString.length > 0) {
-            this.args = JSON.parse(argsString);
-            invariant(Array.isArray(this.args), `Arguments must be a JSON array but is of type: '${typeof this.args}'.`);
-        }
+    constructor(private value: string, private typeName: string, private fieldName?: string, private args?: Array<any>) {
     }
 
     apply(schema: GraphQLSchema, mocks: Object): void {
@@ -42,7 +35,7 @@ const anyMockAnnotationFactory: any = function (directiveInfo: DirectiveInfo, ty
 
     const argumentDescriptors: ArgumentDescriptors = {
         value: {type: 'string', required: true},
-        args: {type: 'string'}
+        args: {type: 'object'}
     };
     const {value, args} = extractArguments(ANNOTATION_TAG, directiveInfo.arguments, argumentDescriptors);
 
