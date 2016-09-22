@@ -23,90 +23,10 @@ type AnnotationArguments =  {
 };
 
 /**
+ *
  * Adds a resolver function to a field which performs a REST request
  *
- * Examples:
- *
- * - Basic usage
- *
- * type Query {
- *     todos: [Todos] @rest(url: "https://todos.com/todos")
- * }
- *
- * { todos {id title} } translates into the request: "GET https://todos.com/todos"
- *
- * - Automatic query parameter mapping as request parameters
- *
- * type Query {
- *     todos(completed: Boolean, max: Int): [Todos] @rest(url: "https://todos.com/todos")
- * }
- *
- * { todos(q: true, max: 10) {id title} } translates into the request: "GET https://todos.com/todos?q=true&max=10"
- *
- * - POST support with automatic query parameter mapping as request parameters
- *
- * type Query {
- *     todos(completed: Boolean, max: Int): [Todos] @rest(url: "https://todos.com/todos")
- * }
- *
- * { todos(q: true, max: 10) {id title} } translates into the request: "POST https://todos.com/todos {q: true, max: 10}"
- *
- * - Result field selection
- *
- * type Query {
- *     todos: [Todos] @rest(url: "https://todos.com/todos", resultField: "items")
- * }
- *
- * { todos {id title} } translates into the request: "GET https://todos.com/todos" and selects the "items" field from the JSON response
- *
- * - Base URL as default value (type or field level)
- *
- * type Query @rest(baseUrl: "https://todos.com") {
- *     todos: [Todos] @rest(url: "todos")
- * }
- *
- * { todos {id title} } translates into the request: "GET https://todos.com/todos"
- *
- * - Authorization support as default value (type or field level)
- *
- * type Query @rest(basicAuthorization: "123abc456def") {
- *     todos: [Todos] @rest(url: "https://todos.com/todos")
- * }
- *
- * { todos {id title} } translates into the request: "GET https://todos.com/todos" with 'Authentication': 'Basic 123abc456def' header
- *
- * - Authorization support with environment variable resolution (type or field level)
- *
- * type Query @rest(basicAuthorization: "{{auth}}") {
- *     todos: [Todos] @rest(url: "https://todos.com/todos")
- * }
- *
- * given an environment variable 'auth' with value '123abc456def' translates { todos {id title} } into the request:
- * "GET https://todos.com/todos" with 'Authentication': 'Basic 123abc456def' header
- *
- * - Query parameter to URL parameter mapping
- *
- * type Query {
- *     todos(param1: String, param2: String): [Todos] @rest(url: "https://todos.com/todos/{{param1}}/{{param2}}")
- * }
- *
- * { todos(param1: 'value1', param2: 'value2') {id title} } translates into the request: "GET https://todos.com/todos/value1/value2"
- *
- * - Query parameter to URL parameter mapping with automatic mapping of remaining parameters as request parameters
- *
- * type Query {
- *     todos(param1: String, param2: String): [Todos] @rest(url: "https://todos.com/todos/{{param1}}")
- * }
- *
- * { todos(param1: 'value1', param2: 'value2') {id title} } translates into the request: "GET https://todos.com/todos/value1?param2=value2"
- *
- * - Query parameter selection
- *
- * type Query {
- *     todos(param1: String, param2: String): [Todos] @rest(url: "https://todos.com/todos", params: ["param2"])
- * }
- *
- * { todos(param1: 'value1', param2: 'value2') {id title} } translates into the request: "GET https://todos.com/todos/value1?param2=value2"
+ * For usage examples see the README.md file
  *
  */
 class RestAnnotation {

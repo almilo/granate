@@ -5,25 +5,11 @@ import { extractArguments, ArgumentDescriptors } from '../lib';
 import { AnnotationFactory, Annotation, DirectiveInfo } from '../index';
 
 /**
- * Given a value through the 'value' attribute, adds a mock function to the 'mocks' which returns the corresponding
- * 'casual' property (see https://githum.com/boo1ean/casual). If the selected casual property is a function, it will
- * be invoked with the arguments provided in the 'args' attribute. The 'args' attribute must be a JSON array. Mocks can
- * be added to types or fields.
  *
- * Examples:
+ * Adds a resolver function to a field which produces mock data
  *
- * type FooCard @mock(value: "card_data") {
- *     type: String
- *     number: String
- * }
+ * For usage examples see the README.md file
  *
- * type Foo {
- *     text: String @mock(value: "statement")
- * }
- *
- * type Bar {
- *     date: String @mock(value: "date", args: "[\"DD.MM.YY\"]")
- * }
  */
 class MockAnnotation {
     args: Array<any> = [];
