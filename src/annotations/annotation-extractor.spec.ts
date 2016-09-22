@@ -36,7 +36,7 @@ describe('AnnotationExtractor', function () {
     it('should return the annotations when the annotations match', function () {
         let schema = `
             type Query {
-                foo: String @bar( string: "hello world!", int: 42, float: 32.5, boolean: true )
+                foo: String @bar( string: "hello world!", int: 42, float: 32.5, boolean: true, list: ["Foo", "Bar"] )
             }
         `;
 
@@ -50,7 +50,8 @@ describe('AnnotationExtractor', function () {
                 {name: 'string', value: 'hello world!'},
                 {name: 'int', value: 42},
                 {name: 'float', value: 32.5},
-                {name: 'boolean', value: true}
+                {name: 'boolean', value: true},
+                {name: 'list', value: ['Foo', 'Bar']}
             ]
         }]);
 

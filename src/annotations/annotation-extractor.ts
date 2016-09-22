@@ -7,10 +7,8 @@ interface ASTNode {
     name: {
         value: string
     },
-    value: {
-        kind: string,
-        value: any
-    },
+    value: any,
+    values: Array<ASTNode>,
     directives: Array<ASTNode>,
     arguments: Array<ASTNode>
 }
@@ -123,23 +121,6 @@ export class AnnotationExtractor {
 }
 
 /**
- * Convenience function used when the type needs no coercion
- *
- * @param value any value which will be itself returned without modification
- */
-const identity = (value: any) => value;
-
-/**
- * Map with the converters supported to convert a GraphQL value to a JS value
- */
-const converters = {
-    StringValue: identity,
-    BooleanValue: identity,
-    IntValue: parseInt,
-    FloatValue: parseFloat
-};
-
-/**
  * Function which, given a GraphQL argument value, returns a JS value or throws an exception if there is no converter
  * for it
  *
@@ -149,16 +130,37 @@ const converters = {
 function parseArgument(argumentNode: ASTNode): DirectiveArgument {
     return {
         name: argumentNode.name.value,
-        value: toJSON(argumentNode.value.kind, argumentNode.value.value)
+        value: toJSValue(argumentNode.value)
     };
+}
 
-    function toJSON(kind: string, value: any): any {
-        const converter = converters[kind];
+/**
+ * Map with the converters supported to convert a GraphQL value to a JS value
+ */
+const converters = {
+    StringValue: (value: ASTNode) => value.value,
+    BooleanValue: (value: ASTNode) => value.value,
+    IntValue: (value: ASTNode) => parseInt(value.value),
+    FloatValue: (value: ASTNode) => parseFloat(value.value),
+    ListValue: listValue
+};
 
-        if (!converter) {
-            throw new Error(`Conversion for values of type: '${kind}' not supported.`);
-        }
+function toJSValue(value: ASTNode): any {
+    const converter = converters[value.kind];
 
-        return converter(value);
+    if (!converter) {
+        throw new Error(`Conversion for values of type: '${value.kind}' not supported.`);
+    }
+
+    return converter(value);
+}
+
+function listValue(value: ASTNode): Array<any> {
+    return value.values.reduce(convertValue, []);
+
+    function convertValue(convertedValues: Array<any>, currentValue: ASTNode) {
+        convertedValues.push(toJSValue(currentValue));
+
+        return convertedValues;
     }
 }
