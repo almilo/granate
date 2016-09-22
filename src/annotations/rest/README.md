@@ -200,3 +200,15 @@ Granate server listening on: 'http://localhost:4000/graphql'.
 ```
 "query { todos {id title} }" translates into: "GET https://todos.com/todos / headers: { Foo: "Bar", Baz: "Biz" }"
 ```
+
+## Debugging
+
+As this annotation uses [request](https://github.com/request/request) to make HTTP calls, set the environment vaiable
+**NODE_DEBUG** with the value **request** to log HTTP request information in the console.
+
+```
+> NODE_DEBUG=request granate serve todos.graphqls -a
+
+Annotations: 'mock,rest' enabled.
+Granate server listening on: 'http://localhost:4000/graphql'.
+```
