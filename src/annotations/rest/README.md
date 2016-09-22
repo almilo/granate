@@ -177,3 +177,22 @@ type Query {
 ```
 "query { todos(param1: 'value1', param2: 'value2') {id title} }" translates into: "GET https://todos.com/todos/value1?param2=value2"
 ```
+
+### Custom headers support 
+
+```
+type Query {
+    todos: [Todos] @rest(url: "https://todos.com/todos", customHeaders: ["Foo: Bar", "Baz: {{BAZ}}"])
+}
+```
+
+```
+> BAZ=Biz granate serve todos.graphqls -a
+
+Annotations: 'mock,rest' enabled.
+Granate server listening on: 'http://localhost:4000/graphql'.
+```
+
+```
+"query { todos {id title} }" translates into: "GET https://todos.com/todos / headers: { Foo: "Bar", Baz: "Biz" }"
+```

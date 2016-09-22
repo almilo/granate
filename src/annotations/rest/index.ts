@@ -20,7 +20,8 @@ type AnnotationArguments =  {
     method?: string,
     resultField?: string,
     basicAuthorization?: string,
-    tokenAuthorization?: string
+    tokenAuthorization?: string,
+    customHeaders?: Array<string>
 };
 
 /**
@@ -44,7 +45,13 @@ class RestAnnotation {
                 'Token' :
                 undefined;
 
-        applyToRequestDefaults(requestDefaultsByType, this.annotationArguments.baseUrl, authorization, authorizationType);
+        applyToRequestDefaults(
+            requestDefaultsByType,
+            this.annotationArguments.baseUrl,
+            authorization,
+            authorizationType,
+            this.annotationArguments.customHeaders
+        );
 
         if (this.fieldName) {
             invariant(schema.getType(this.typeName) === schema.getQueryType(), 'Only annotation of query fields is supported.');
@@ -66,7 +73,8 @@ const anyRestAnnotationFactory: any = function (directiveInfo: DirectiveInfo, ty
         method: {type: 'string'},
         resultField: {type: 'string'},
         basicAuthorization: {type: 'string'},
-        tokenAuthorization: {type: 'string'}
+        tokenAuthorization: {type: 'string'},
+        customHeaders: {type: 'object'}
     };
     const annotationArguments = extractArguments(ANNOTATION_TAG, directiveInfo.arguments, argumentDescriptors);
 
@@ -77,7 +85,11 @@ anyRestAnnotationFactory.TAG = ANNOTATION_TAG;
 
 export const restAnnotationFactory: AnnotationFactory = anyRestAnnotationFactory;
 
-function applyToRequestDefaults(requestDefaults: RequestDefaults, baseUrl?: string, authorization?: string, authorizationType?: string): void {
+function applyToRequestDefaults(requestDefaults: RequestDefaults,
+                                baseUrl?: string,
+                                authorization?: string,
+                                authorizationType?: string,
+                                customHeaders?: Array<string>): void {
     if (baseUrl) {
         requestDefaults.baseUrl = baseUrl;
     }
@@ -86,6 +98,15 @@ function applyToRequestDefaults(requestDefaults: RequestDefaults, baseUrl?: stri
         const authorizationValue = getValue(authorization, process.env);
 
         requestDefaults.headers['Authorization'] = `${authorizationType} ${authorizationValue}`;
+    }
+
+    if (customHeaders) {
+        customHeaders.forEach(customHeader => {
+            const [name, value] = customHeader.split(':').map(value => value.trim());
+            const headerValue = getValue(value, process.env);
+
+            requestDefaults.headers[name] = `${headerValue}`;
+        });
     }
 }
 

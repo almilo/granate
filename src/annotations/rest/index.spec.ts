@@ -288,6 +288,38 @@ describe('RestAnnotation', function () {
                 }));
             });
     });
+
+    it('should support default custom headers with value resolution', () => {
+        process.env.baz = 'Biz';
+        const rootValue: any = {};
+        const contextValue: any = {};
+
+        createAnnotation('Query', null, [{name: 'customHeaders', value: ['Foo: Bar', 'Baz: {{baz}}']}]).apply(schema, {}, rootValue, contextValue);
+        createAnnotation('Query', 'foo', [{name: 'url', value: 'foo'}]).apply(schema, {}, rootValue, contextValue);
+
+        return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.should.deep.equal({
+            'User-Agent': 'granate',
+            'Foo': 'Bar',
+            'Baz': 'Biz'
+        }));
+    });
+
+    it('should support custom headers with value resolution', () => {
+        process.env.baz = 'Biz';
+        const restAnnotation = createAnnotation('Query', 'foo', [
+            {name: 'url', value: 'foo'},
+            {name: 'customHeaders', value: ['Foo: Bar', 'Baz: {{baz}}']}
+        ]);
+        const rootValue: any = {};
+
+        restAnnotation.apply(schema, {}, rootValue, {});
+
+        return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.should.deep.equal({
+            'User-Agent': 'granate',
+            'Foo': 'Bar',
+            'Baz': 'Biz'
+        }));
+    });
 });
 
 function createAnnotation(typeName: string, fieldName: string, directiveArguments: Array<DirectiveArgument>): Annotation {
