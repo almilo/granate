@@ -97,7 +97,7 @@ function applyToRequestDefaults(requestDefaults: RequestDefaults,
     if (authorization) {
         const authorizationValue = getValue(authorization, process.env);
 
-        requestDefaults.headers['Authorization'] = `${authorizationType} ${authorizationValue}`;
+        getOrCreate(requestDefaults, 'headers')['Authorization'] = `${authorizationType} ${authorizationValue}`;
     }
 
     if (customHeaders) {
@@ -105,7 +105,7 @@ function applyToRequestDefaults(requestDefaults: RequestDefaults,
             const [name, value] = customHeader.split(':').map(value => value.trim());
             const headerValue = getValue(value, process.env);
 
-            requestDefaults.headers[name] = `${headerValue}`;
+            getOrCreate(requestDefaults, 'headers')[name] = `${headerValue}`;
         });
     }
 }
@@ -153,11 +153,32 @@ function getDataLoader(contextValue?: {_restDataLoader: DataLoader<Request, Obje
     }
 
     function serializeRequestKey({method, baseUrl, url, parameters, resultField}: Request): string {
-        const serializedParameters = Object.keys(parameters)
+        const serializedParameters = Object.keys(parameters || {})
             .map(parameterName => `${parameterName}=${parameters[parameterName]}`)
             .join(':');
 
         return `${method}:${baseUrl}:${url}:${serializedParameters}:${resultField}`;
+    }
+}
+
+function replaceUrlTemplates(url: string, parameters: Array<string>, valuesSource: {}) {
+    const nonEmptyValues = filterUndefinedValues(valuesSource, parameters || Object.keys(valuesSource));
+
+    return {
+        url: url.replace(/(\{\{(.*?)\}\})/g, createArgumentReplacer(nonEmptyValues)),
+        parameters: Object.keys(nonEmptyValues).length ? nonEmptyValues : undefined
+    };
+
+    function createArgumentReplacer(args: {[key: string]: any}) {
+        return (match: string, argumentTemplate: string, argumentName: string) => {
+            const argument = args[argumentName];
+
+            invariant(argument !== undefined, `Replacement value for url argument: '${argumentName}' not found.`);
+
+            delete args[argumentName];
+
+            return argument;
+        };
     }
 }
 
@@ -175,27 +196,6 @@ function filterUndefinedValues(valueSource: {[key: string]: any}, valueNames: Ar
     }
 }
 
-function replaceUrlTemplates(url: string, parameters: Array<string>, valuesSource: {}) {
-    const nonEmptyValues = filterUndefinedValues(valuesSource, parameters || Object.keys(valuesSource));
-
-    return {
-        url: url.replace(/(\{\{(.*?)\}\})/g, createArgumentReplacer(nonEmptyValues)),
-        parameters: nonEmptyValues
-    };
-
-    function createArgumentReplacer(args: {[key: string]: any}) {
-        return (match: string, argumentTemplate: string, argumentName: string) => {
-            const argument = args[argumentName];
-
-            invariant(argument !== undefined, `Replacement value for url argument: '${argumentName}' not found.`);
-
-            delete args[argumentName];
-
-            return argument;
-        };
-    }
-}
-
 function getValue(valueOrVariableName: string, context: {}): string {
     const envVariableName: string = (valueOrVariableName.match(/\{\{(.*?)\}\}/) || [])[1];
 
@@ -206,7 +206,6 @@ function getRequestDefaultsInitialValues() {
     return {
         json: true,
         jar: true,
-        method: 'get',
-        headers: {'User-Agent': 'granate'}
+        method: 'get'
     };
 }

@@ -298,7 +298,6 @@ describe('RestAnnotation', function () {
         createAnnotation('Query', 'foo', [{name: 'url', value: 'foo'}]).apply(schema, {}, rootValue, contextValue);
 
         return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.should.deep.equal({
-            'User-Agent': 'granate',
             'Foo': 'Bar',
             'Baz': 'Biz'
         }));
@@ -315,7 +314,6 @@ describe('RestAnnotation', function () {
         restAnnotation.apply(schema, {}, rootValue, {});
 
         return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.should.deep.equal({
-            'User-Agent': 'granate',
             'Foo': 'Bar',
             'Baz': 'Biz'
         }));
@@ -335,8 +333,8 @@ function withDefaults(payload: any): Object {
         method: payload.method || 'get',
         baseUrl: payload.baseUrl,
         url: payload.url,
-        parameters: payload.parameters || {},
-        headers: Object.assign({}, {'User-Agent': 'granate'}, payload.headers),
+        parameters: payload.parameters,
+        headers: payload.headers,
         resultField: payload.resultField
     });
 }
