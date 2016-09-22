@@ -77,12 +77,16 @@ type Query {
 "query { todos {id title} }" translates into: "GET https://todos.com/todos" and selects the "items" field from the JSON response
 ```
 
-### Base URL as default value (type or field level)
+### Base URL as default value (schema, type or field level)
 When used at the type level, all the fields of the type inherit this argument
 
 ```
-type Query @rest(baseUrl: "https://todos.com") {
+type Query {
     todos: [Todos] @rest(url: "todos")
+}
+
+schema @rest(baseUrl: "https://todos.com") {
+    query: Query
 }
 ```
 
@@ -90,7 +94,7 @@ type Query @rest(baseUrl: "https://todos.com") {
 "query { todos {id title} }" translates into: "GET https://todos.com/todos"
 ```
 
-### Basic authorization support as default value (type or field level)
+### Basic authorization support as default value (schema, type or field level)
 When used at the type level, all the fields of the type inherit this argument
 
 ```
@@ -103,7 +107,7 @@ type Query @rest(basicAuthorization: "123abc456def") {
 "query { todos {id title} }" translates into: "GET https://todos.com/todos / headers: { Authentication: "Basic 123abc456def" }"
 ```
 
-### Basic authorization support with environment variable resolution (type or field level)
+### Basic authorization support with environment variable resolution (schema, type or field level)
 In order to avoid authentication information in the code, it is recommended to use environment variable resolution instead
 
 ```
@@ -178,7 +182,7 @@ type Query {
 "query { todos(param1: 'value1', param2: 'value2') {id title} }" translates into: "GET https://todos.com/todos/value1?param2=value2"
 ```
 
-### Custom headers support 
+### Custom headers support (schema, type or field level)
 
 ```
 type Query {

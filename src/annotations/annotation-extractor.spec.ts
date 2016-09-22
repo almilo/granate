@@ -126,6 +126,27 @@ describe('AnnotationExtractor', function () {
                 arguments: [{name: 'baz', value: 'foo'}]
             }
         ]);
+
+        schema = `
+            type Query {
+                foo: String
+            }
+            
+            schema @bar( foo: "baz" ) {
+                query: Query
+            }
+        `;
+
+        schemaAnnotations = annotationExtractor.parse(schema);
+
+        schemaAnnotations.should.deep.equal([
+            {
+                typeName: 'SchemaDefinition',
+                fieldName: undefined,
+                tag: 'bar',
+                arguments: [{name: 'foo', value: 'baz'}]
+            }
+        ]);
     });
 
     it('should support annotation factories not returning anything', function () {
@@ -138,7 +159,7 @@ describe('AnnotationExtractor', function () {
         let schemaAnnotations = annotationExtractor.parse(schema);
 
         schemaAnnotations.should.deep.equal([]);
-   });
+    });
 
     it('should support passing a schema as AST', function () {
         const schema = `
@@ -173,7 +194,7 @@ describe('AnnotationExtractor', function () {
 
 function createAnnotationFactory(tag: string, emptyResult: boolean = false): AnnotationFactory {
     const annotationFactory: any = (directiveInfo: DirectiveInfo, typeName: string, fieldName: string) => {
-        return !emptyResult && Object.assign({ typeName, fieldName}, directiveInfo);
+        return !emptyResult && Object.assign({typeName, fieldName}, directiveInfo);
     };
     annotationFactory.TAG = tag;
 

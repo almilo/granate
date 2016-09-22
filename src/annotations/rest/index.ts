@@ -36,8 +36,8 @@ class RestAnnotation {
     }
 
     apply(schema: GraphQLSchema, mocks: Object, rootValue: Object, contextValue: Object): void {
-        const requestDefaults: RequestDefaults = <RequestDefaults>getOrCreate(contextValue, '_requestDefaults');
-        const requestDefaultsByType: RequestDefaults = <RequestDefaults>getOrCreate(requestDefaults, this.typeName, getRequestDefaultsInitialValues());
+        const requestDefaultsContainer: {} = getOrCreate(contextValue, '_requestDefaults');
+        const typeRequestDefaults: RequestDefaults = <RequestDefaults>getOrCreate(requestDefaultsContainer, this.typeName, getRequestDefaultsInitialValues());
         const authorization = this.annotationArguments.basicAuthorization || this.annotationArguments.tokenAuthorization;
         const authorizationType = this.annotationArguments.basicAuthorization ?
             'Basic' :
@@ -46,7 +46,7 @@ class RestAnnotation {
                 undefined;
 
         applyToRequestDefaults(
-            requestDefaultsByType,
+            typeRequestDefaults,
             this.annotationArguments.baseUrl,
             authorization,
             authorizationType,
@@ -56,7 +56,20 @@ class RestAnnotation {
         if (this.fieldName) {
             invariant(schema.getType(this.typeName) === schema.getQueryType(), 'Only annotation of query fields is supported.');
 
-            rootValue[this.fieldName] = createResolver(requestDefaultsByType, this.annotationArguments);
+            const schemaRequestDefaults = requestDefaultsContainer['SchemaDefinition'];
+            const defaultHeaders = Object.assign(
+                {},
+                schemaRequestDefaults && schemaRequestDefaults.headers,
+                typeRequestDefaults.headers
+            );
+            const requestDefaults = Object.assign(
+                {},
+                schemaRequestDefaults,
+                typeRequestDefaults,
+                Object.keys(defaultHeaders).length ? {headers: defaultHeaders} : undefined
+            );
+
+            rootValue[this.fieldName] = createResolver(requestDefaults, this.annotationArguments);
         }
     }
 }

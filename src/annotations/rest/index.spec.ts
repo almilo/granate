@@ -121,6 +121,40 @@ describe('RestAnnotation', function () {
             .should.eventually.become('bar');
     });
 
+    it('should support default values at schema level', () => {
+        const restAnnotation1 = createAnnotation('SchemaDefinition', null, [
+            {name: 'customHeaders', value: ['User-Agent: Foo']},
+            {name: 'baseUrl', value: 'http://localhost:4000'}
+        ]);
+        const restAnnotation2 = createAnnotation('Query', null, [
+            {name: 'customHeaders', value: ['X-Foo: Bar']},
+            {name: 'baseUrl', value: 'http://localhost:5000'}
+        ]);
+        const restAnnotation3 = createAnnotation('Query', 'foo', [
+            {name: 'url', value: 'foo'}
+        ]);
+
+        const rootValue: any = {};
+        const contextValue: any = {};
+
+        restAnnotation1.apply(schema, {}, rootValue, contextValue);
+        restAnnotation2.apply(schema, {}, rootValue, contextValue);
+        restAnnotation3.apply(schema, {}, rootValue, contextValue);
+
+        return rootValue.foo({}, {}, contextValue)
+            .then(() => {
+                makeRequestStub.calledOnce.should.be.true;
+                makeRequestStub.args[0][0].should.deep.equal(withDefaults({
+                    baseUrl: 'http://localhost:5000',
+                    url: 'foo',
+                    headers: {
+                        'User-Agent': 'Foo',
+                        'X-Foo': 'Bar'
+                    }
+                }));
+            });
+    });
+
     it('should ignore baseUrl when url is absolute', () => {
         const rootValue: any = {};
         const contextValue: any = {};

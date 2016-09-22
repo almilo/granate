@@ -107,7 +107,7 @@ export class AnnotationExtractor {
                 function extractTypeAndFieldNames(ancestorNodes: Array<ASTNode>, targetNode: ASTNode): {typeName: string, fieldName: string} {
                     const fieldName = targetNode.kind === 'FieldDefinition' ? targetNode.name.value : undefined;
                     const typeNode = fieldName ? findTypeNode(ancestorNodes) : targetNode;
-                    const typeName = typeNode.name.value;
+                    const typeName = typeNode.kind === 'SchemaDefinition' ? typeNode.kind : typeNode.name.value;
 
                     return {typeName, fieldName};
 
