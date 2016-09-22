@@ -19,7 +19,8 @@ type AnnotationArguments =  {
     parameters?: Array<string>,
     method?: string,
     resultField?: string,
-    basicAuthorization?: string
+    basicAuthorization?: string,
+    tokenAuthorization?: string
 };
 
 /**
@@ -36,12 +37,14 @@ class RestAnnotation {
     apply(schema: GraphQLSchema, mocks: Object, rootValue: Object, contextValue: Object): void {
         const requestDefaults: RequestDefaults = <RequestDefaults>getOrCreate(contextValue, '_requestDefaults');
         const requestDefaultsByType: RequestDefaults = <RequestDefaults>getOrCreate(requestDefaults, this.typeName, getRequestDefaultsInitialValues());
+        const authorization = this.annotationArguments.basicAuthorization || this.annotationArguments.tokenAuthorization;
+        const authorizationType = this.annotationArguments.basicAuthorization ?
+            'Basic' :
+            this.annotationArguments.tokenAuthorization ?
+                'Token' :
+                undefined;
 
-        applyToRequestDefaults(
-            requestDefaultsByType,
-            this.annotationArguments.baseUrl,
-            this.annotationArguments.basicAuthorization
-        );
+        applyToRequestDefaults(requestDefaultsByType, this.annotationArguments.baseUrl, authorization, authorizationType);
 
         if (this.fieldName) {
             invariant(schema.getType(this.typeName) === schema.getQueryType(), 'Only annotation of query fields is supported.');
@@ -62,7 +65,8 @@ const anyRestAnnotationFactory: any = function (directiveInfo: DirectiveInfo, ty
         parameters: {type: 'object'},
         method: {type: 'string'},
         resultField: {type: 'string'},
-        basicAuthorization: {type: 'string'}
+        basicAuthorization: {type: 'string'},
+        tokenAuthorization: {type: 'string'}
     };
     const annotationArguments = extractArguments(ANNOTATION_TAG, directiveInfo.arguments, argumentDescriptors);
 
@@ -73,17 +77,15 @@ anyRestAnnotationFactory.TAG = ANNOTATION_TAG;
 
 export const restAnnotationFactory: AnnotationFactory = anyRestAnnotationFactory;
 
-function applyToRequestDefaults(requestDefaults: RequestDefaults,
-                                baseUrl?: string,
-                                basicAuthorization?: string): void {
+function applyToRequestDefaults(requestDefaults: RequestDefaults, baseUrl?: string, authorization?: string, authorizationType?: string): void {
     if (baseUrl) {
         requestDefaults.baseUrl = baseUrl;
     }
 
-    if (basicAuthorization) {
-        const basicAuthorizationValue = getValue(basicAuthorization, process.env);
+    if (authorization) {
+        const authorizationValue = getValue(authorization, process.env);
 
-        requestDefaults.headers['Authorization'] = `Basic ${basicAuthorizationValue}`;
+        requestDefaults.headers['Authorization'] = `${authorizationType} ${authorizationValue}`;
     }
 }
 

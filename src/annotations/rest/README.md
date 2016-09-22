@@ -90,7 +90,7 @@ type Query @rest(baseUrl: "https://todos.com") {
 "query { todos {id title} }" translates into: "GET https://todos.com/todos"
 ```
 
-### Authorization support as default value (type or field level)
+### Basic authorization support as default value (type or field level)
 When used at the type level, all the fields of the type inherit this argument
 
 ```
@@ -103,7 +103,7 @@ type Query @rest(basicAuthorization: "123abc456def") {
 "query { todos {id title} }" translates into: "GET https://todos.com/todos / headers: { Authentication: "Basic 123abc456def" }"
 ```
 
-### Authorization support with environment variable resolution (type or field level)
+### Basic authorization support with environment variable resolution (type or field level)
 In order to avoid authentication information in the code, it is recommended to use environment variable resolution instead
 
 ```
@@ -121,6 +121,25 @@ Granate server listening on: 'http://localhost:4000/graphql'.
 
 ```
 "query { todos {id title} }" translates into: "GET https://todos.com/todos / headers: { Authentication: "Basic 123abc456def" }"
+```
+
+### Token authorization support (similar to basic authorization)
+
+```
+type Query @rest(tokenAuthorization: "{{TOKEN_AUTH}}") {
+    todos: [Todos] @rest(url: "https://todos.com/todos")
+}
+```
+
+```
+> TOKEN_AUTH=1234567890 granate serve todos.graphqls -a
+
+Annotations: 'mock,rest' enabled.
+Granate server listening on: 'http://localhost:4000/graphql'.
+```
+
+```
+"query { todos {id title} }" translates into: "GET https://todos.com/todos / headers: { Authentication: "Token 1234567890" }"
 ```
 
 ### Query parameter to URL parameter mapping

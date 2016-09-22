@@ -150,6 +150,19 @@ describe('RestAnnotation', function () {
         return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.Authorization.should.equal('Basic AUTH_HASH'));
     });
 
+    it('should support token based authentication', () => {
+        process.env.tokenAuth = 'AUTH_TOKEN';
+        const restAnnotation = createAnnotation('Query', 'foo', [
+            {name: 'url', value: 'foo'},
+            {name: 'tokenAuthorization', value: '{{tokenAuth}}'}
+        ]);
+        const rootValue: any = {};
+
+        restAnnotation.apply(schema, {}, rootValue, {});
+
+        return rootValue.foo({}, {}, {}) .then(result => makeRequestStub.args[0][0].headers.Authorization.should.equal('Token AUTH_TOKEN'));
+    });
+
     it('should replace url parameter templates with arguments', () => {
         const restAnnotation = createAnnotation('Query', 'foo', [{name: 'url', value: 'http://localhost:4000/foo/{{param1}}/bar/{{param2}}'}]);
         const rootValue: any = {};
