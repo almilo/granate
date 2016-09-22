@@ -4,19 +4,15 @@
 [![Build Status](https://travis-ci.org/almilo/granate.svg?branch=master)](https://travis-ci.org/almilo/granate)
 [![Coverage Status](https://coveralls.io/repos/github/almilo/granate/badge.svg)](https://coveralls.io/github/almilo/granate)
 
-Granate container for annotated GraphQL
+Build better APIs with *annotated GraphQL*
 
 ## Introduction
 [GraphQL](http://graphql.org/) is an amazing technology that allows to build application APIs in a much better way than
-by implementing REST services. On top of this, [GraphQL](http://graphql.org/) can be defined using a textual
-representation (schema language) which offers a lot of really useful possibilities. **Granate** leverages these
-possibilities.
+by implementing REST services. A GraphQL schema can be defined using a textual representation (schema language) which,
+when extended by mean of *annotations* (decorators with GraphQL directive syntax), leverages a lot of really useful
+possibilities. **Granate** helps you to build executable schemas with no code and evolve them rapidly.
 
-## Usage
-To understand better how to use **granate**, please have a look at the examples in
-[granate-showcase](https://github.com/almilo/granate-showcase) 
-
-## Installation
+## Usage from the CLI
 In order to use **granate** from the CLI, install [granate-cli](https://github.com/almilo/granate-cli) with the
 following command:
  
@@ -24,153 +20,54 @@ following command:
 > npm i -g granate-cli
 ```
 
+```
+# file: todos.graphqls
+
+type Todo {
+    id: ID
+    title: String
+    completed: Boolean
+}
+
+type Query {
+    todos: [Todo]
+}
+```
+
+```
+> granate serve todos.graphqls -a
+
+Annotations: 'mock,rest' enabled.
+Granate server listening on: 'http://localhost:4000/graphql'.
+```
+
+## Usage from the CLI with auto-reload (watch mode)
+To get **granate** restarted on every schema change install [nodemon](https://github.com/remy/nodemon) and use it as
+follows: 
+ 
+```
+> npm i -g nodemon
+```
+
+```
+> nodemon --exec granate serve todos.graphqls -a -- -e js,json,graphqls
+
+[nodemon] 1.10.2
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching: *.*
+[nodemon] starting `granate serve todos.graphqls -a -e js,json,graphqls`
+Annotations: 'mock,rest' enabled.
+Granate server listening on: 'http://localhost:4000/graphql'.
+```
+
+## Usage as API
 If you prefer to use **granate** as an API, install **granate** and **graphql** (peer dependency of **granate**) in your
-application with the following command:
+application with the following command and have a look at the [tests](src/index.spec.js) to learn the API. 
                                  
 ```
 > npm i granate graphql --save
 ```
 
-## Where does **granate** come from? (TL;DR)
-Imagine that you want to implement a Todo application and you have drafted a GraphQL schema which looks as follows:
-
-```
-# Domain entity which represents a Todo object
-type Todo {
-    id: ID!
-    title: String!
-    completed: Boolean!
-}
-
-# Query model for Todos
-type Query {
-    # Returns the collection of Todos filtered by completed status (optional)
-    todos(completed: Boolean): [Todo]
-}
-
-# Mutations for Todos
-type Mutation {
-    # Adds an uncompleted Todo with the given description
-    addTodo(title: String!): Todo!
-    # Removes a Todo by id
-    removeTodo(id: ID!): Todo!
-    # Toggles the completed state of a Todo by id
-    toggleTodo(id: ID!): Todo!
-}
-```
-
-As of [graphql-js@0.7.0](https://medium.com/apollo-stack/all-you-need-to-know-about-graphql-js-0-7-921e75dd7fd1), by
-using the ```buildSchema()``` and ```graphql()``` functions together with an object like the one below as
-```rootValue```, it is then possible to execute GraphQL queries and mutations against the object as if it were a
-full-fledged GraphQL endpoint.
- 
-```js
-export class Todos {
-    constructor() {
-        this.nextId = Date.now();
-        this.todos = [];
-    }
-
-    todos({completed}) {
-        return this.todos.filter(completedFilter);
-
-        function completedFilter(todo) {
-            return completed === undefined ? todo : todo.completed === completed;
-        }
-    }
-
-    addTodo({title}) {
-        const todo = {
-            id: String(this.nextId++),
-            title,
-            completed: false
-        };
-        this.todos.push(todo);
-
-        return todo;
-    }
-
-    removeTodo({id}) {
-        const todo = this.todos.filter(todo => todo.id === id)[0];
-        todos.splice(this.todos.indexOf(todo), 1);
-
-        return todo;
-    }
-
-    toggleTodo({id}) {
-        const todo = this.todos.filter(todo => todo.id === id)[0];
-        todo.completed = !todo.completed;
-
-        return todo;
-    }
-}
-```
- 
-Then you can use this as:
- 
-```js
-import { buildSchema } from 'graphql';
-import { Todos } from './todos';
-
-const schemaText = `
-# Domain entity which represents a Todo object
-type Todo {
-... content skipped
-`;
-const query = `
-    { 
-        todos {
-            title
-            completed
-        }
-    }`;
-const todos = new Todos();
-
-graphql(buildSchema(schemaText), query, todos).then(result => console.log(result)); // prints the query result
-
-```
-
-And if you want to make this API available through HTTP:
-
-```js
-import express from 'express';
-import graphqlHTTP from 'express-graphql';
-import { buildSchema } from 'graphql';
-import { Todos } from './todos';
-
-const PORT = 4000;
-const schemaText = `
-# Domain entity which represents a Todo object
-type Todo {
-... content skipped
-`;
-const todos = new Todos();
-const graphqlHTTPConfig = createGraphQLHTTPConfig(buildSchema(schemaText), todos);
-
-express()
-    .use('/graphql', graphqlHTTP(graphqlHTTPConfig))
-    .listen(PORT, () => console.log(`Listening on port: '${PORT}'...`));
-
-function createGraphQLHTTPConfig(schema, rootValue) {
-    return {
-        schema,
-        rootValue,
-        graphiql: true
-    };
-}
-```
-
-Wouldn't it be cool if we could avoid defining the ```rootValue``` implementation and use instead mock data like the one
-generated by [casual](https://github.com/boo1ean/casual) or [faker.js](https://github.com/Marak/faker.js)?
-This would allow to mock an API just by using a GraphQL schema text file.
-Well, we easily can if we use the package [graphql-tools](https://github.com/apollostack/graphql-tools)
-as explained in [Mocking your server with just one line of code](https://medium.com/apollo-stack/mocking-your-server-with-just-one-line-of-code-692feda6e9cd).
-
-* But, wouldn't it be better if we could start with a schema file and default mock data and incrementally
-refine the mock data or even the implementation to use as ```rootValue```?
-* And what if we could use mock data where the root value provides no implementation?
-* Couldn't we eventually use a legacy REST API to implement part of the schema?
-* And if we could reuse not only existing REST APIs but also GraphQL endpoints?
-* Even better, what if I could just install a library and do all this from the CLI without writing any code?
-
-###... enter Granate!
+## More examples
+* [Mock annotation](src/annotations/mock)
+* [Rest annotation](src/annotations/rest)
