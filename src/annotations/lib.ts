@@ -17,6 +17,8 @@ export function extractArguments(tag: string,
         const argumentDescriptor = argumentDescriptors[argumentName];
         const extractedArgument = args.find(argument => argument.name === argumentName);
 
+        invariant(argumentDescriptor.type, `Argument descriptor is required.`);
+
         invariant(
             !argumentDescriptor.required || extractedArgument,
             `Missing required argument: '${argumentName}' in '${tag}' annotation.`
@@ -24,8 +26,8 @@ export function extractArguments(tag: string,
 
         if (extractedArgument) {
             invariant(
-                !argumentDescriptor.type || typeof extractedArgument.value === argumentDescriptor.type,
-                `Argument should be of type: '${argumentDescriptor.type}' but it is of type '${typeof extractedArgument.value}' in '${tag}' annotation.`
+                argumentDescriptor.type === 'any' || typeof extractedArgument.value === argumentDescriptor.type,
+                `Argument '${argumentName}' should be of type: '${argumentDescriptor.type}' but it is of type '${typeof extractedArgument.value}' in '${tag}' annotation.`
             );
 
             extractedArguments[argumentName] = extractedArgument.value;
