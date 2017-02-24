@@ -46,7 +46,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^3.0.2",
     "remap-istanbul": "^0.6.4",
-    "rimraf": "^2.5.4",
+    "rimraf": "^2.6.1",
     "semantic-release": "^4.3.5",
     "sinon": "^1.17.5",
     "typescript": "^1.8.10",
