@@ -34,7 +34,7 @@
     "casual": "1.5.3",
     "dataloader": "^1.2.0",
     "graphql-tools": "^0.6.5",
-    "request": "^2.74.0"
+    "request": "^2.80.0"
   },
   "peerDependencies": {
     "graphql": ">=0.7.0"
