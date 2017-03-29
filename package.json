@@ -33,7 +33,7 @@
   "dependencies": {
     "casual": "1.5.3",
     "dataloader": "^1.2.0",
-    "graphql-tools": "^0.6.5",
+    "graphql-tools": "^0.11.0",
     "request": "^2.74.0"
   },
   "peerDependencies": {
