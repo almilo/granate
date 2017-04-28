@@ -37,7 +37,7 @@
     "request": "^2.74.0"
   },
   "peerDependencies": {
-    "graphql": ">=0.7.0"
+    "graphql": ">=0.9.4"
   },
   "devDependencies": {
     "chai": "^3.5.0",
